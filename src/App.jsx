@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import { address, abi } from './config';
 import { getTodos } from './services/todosService';
 import Todos from './components/Todos';
+import { AddTodos } from './components/AddTodos';
 
 if (!window.ethereum) {
 	alert('You must install Metamask!');
@@ -40,6 +41,8 @@ function App() {
 			<button onClick={handleClick}>
 				Get your todo list from a blockchain
 			</button>
+
+			<AddTodos />
 
 			<Todos todos={todos} />
 		</>
