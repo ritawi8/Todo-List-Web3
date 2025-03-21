@@ -14,29 +14,37 @@ function App() {
 	useEffect(() => {
 		if (readContract) return;
 
-		const provider = new ethers.BrowserProvider(window.ethereum);
+		const provider = new ethers.BrowserProvider(window.ethereum); // Skapar en provider
 
-		const todoContract = new ethers.Contract(address, abi, provider);
+		const todoContract = new ethers.Contract(address, abi, provider); // Skapar ett kontrakt baserat på vad vi har installerat på kedjan
 
-		setReadContract(todoContract);
+		setReadContract(todoContract); // Sätt kontrakt till mitt state
 	}, [readContract]);
 
 	const handleClick = async () => {
 		const todoCount = await readContract.todoCount();
-		console.log('Antal todos:', todoCount);
 
+		const todosTempArray = [];
 		for (let i = 0; i < todoCount; i++) {
-			// kan inte använda length här...
-			const todo = await readContract.todos(1); // Fixar inte att hämta hela listan , bara 1 objekt
-			console.log('Todo:', todo.id, todo.text, todo.completed);
+			const todo = await readContract.todos(i + 1);
+
+			todosTempArray.push(todo); // Lägger in todos i en lista
 		}
 
-		setTodos();
+		setTodos(todosTempArray);
 	};
 
 	return (
 		<>
-			<button onClick={handleClick}>Get your todo list</button>
+			<button onClick={handleClick}>
+				Get your todo list from a blockchain
+			</button>
+
+			<ul>
+				{todos.map((todo) => {
+					return <li key={todo.id}>{todo.text}</li>;
+				})}
+			</ul>
 		</>
 	);
 }
