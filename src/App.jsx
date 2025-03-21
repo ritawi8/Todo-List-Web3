@@ -2,6 +2,8 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { address, abi } from './config';
+import { getTodos } from './services/todosService';
+import Todos from './components/Todos';
 
 if (!window.ethereum) {
 	alert('You must install Metamask!');
@@ -9,29 +11,28 @@ if (!window.ethereum) {
 
 function App() {
 	const [readContract, setReadContract] = useState(); // Läser in kontrakt
+	const [writeContract, setWriteContract] = useState(); // Skriver i ett kontrakt
 	const [todos, setTodos] = useState([]); // Lista med todos
 
 	useEffect(() => {
-		if (readContract) return;
+		if (readContract && writeContract) return;
 
-		const provider = new ethers.BrowserProvider(window.ethereum); // Skapar en provider
+		const setupContracts = async () => {
+			const provider = new ethers.BrowserProvider(window.ethereum); // Skapar en provider
 
-		const todoContract = new ethers.Contract(address, abi, provider); // Skapar ett kontrakt baserat på vad vi har installerat på kedjan
+			const rContract = new ethers.Contract(address, abi, provider); // Skapar ett kontrakt baserat på vad vi har installerat på kedjan
 
-		setReadContract(todoContract); // Sätt kontrakt till mitt state
-	}, [readContract]);
+			const signer = await provider.getSigner();
+			const wContract = new ethers.Contract(address, abi, signer);
+			setReadContract(rContract); // Sätt kontrakt till mitt state
+			setWriteContract(wContract);
+		};
+		setupContracts();
+	}, [readContract, writeContract]);
 
 	const handleClick = async () => {
-		const todoCount = await readContract.todoCount();
-
-		const todosTempArray = [];
-		for (let i = 0; i < todoCount; i++) {
-			const todo = await readContract.todos(i + 1);
-
-			todosTempArray.push(todo); // Lägger in todos i en lista
-		}
-
-		setTodos(todosTempArray);
+		const todos = await getTodos(readContract);
+		setTodos(todos);
 	};
 
 	return (
@@ -40,11 +41,7 @@ function App() {
 				Get your todo list from a blockchain
 			</button>
 
-			<ul>
-				{todos.map((todo) => {
-					return <li key={todo.id}>{todo.text}</li>;
-				})}
-			</ul>
+			<Todos todos={todos} />
 		</>
 	);
 }
