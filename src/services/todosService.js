@@ -10,3 +10,14 @@ export const getTodos = async (readContract) => {
 
 	return todosTempArray;
 };
+
+export const createTodo = async (text, writeContract) => {
+	try {
+		const response = await writeContract.createTodo(text);
+		await response.wait();
+
+		return true;
+	} catch {
+		return false;
+	}
+};

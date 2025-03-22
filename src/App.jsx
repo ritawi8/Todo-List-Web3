@@ -31,18 +31,21 @@ function App() {
 		setupContracts();
 	}, [readContract, writeContract]);
 
-	const handleClick = async () => {
+	const getTodosFromChain = async () => {
 		const todos = await getTodos(readContract);
 		setTodos(todos);
 	};
 
 	return (
 		<>
-			<button onClick={handleClick}>
+			<button onClick={getTodosFromChain}>
 				Get your todo list from a blockchain
 			</button>
 
-			<AddTodos />
+			<AddTodos
+				writeContract={writeContract}
+				getTodos={getTodosFromChain}
+			/>
 
 			<Todos todos={todos} />
 		</>
