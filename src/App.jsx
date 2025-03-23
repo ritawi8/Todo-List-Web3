@@ -47,7 +47,11 @@ function App() {
 				getTodos={getTodosFromChain}
 			/>
 
-			<Todos todos={todos} />
+			<Todos
+				todos={todos}
+				getTodos={getTodosFromChain}
+				writeContract={writeContract}
+			/>
 		</>
 	);
 }

@@ -5,7 +5,9 @@ export const getTodos = async (readContract) => {
 	for (let i = 0; i < todoCount; i++) {
 		const todo = await readContract.todos(i + 1);
 
-		todosTempArray.push(todo); // Lägger in todos i en lista
+		if (todo && todo.id > 0) {
+			todosTempArray.push(todo); // Lägger in todos i en lista
+		}
 	}
 
 	return todosTempArray;
@@ -14,6 +16,17 @@ export const getTodos = async (readContract) => {
 export const createTodo = async (text, writeContract) => {
 	try {
 		const response = await writeContract.createTodo(text);
+		await response.wait();
+
+		return true;
+	} catch {
+		return false;
+	}
+};
+
+export const removeTodo = async (id, writeContract) => {
+	try {
+		const response = await writeContract.removeTodo(id);
 		await response.wait();
 
 		return true;
